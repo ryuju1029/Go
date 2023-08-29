@@ -18,7 +18,7 @@ func NewDB() *gorm.DB {
 		}
 	}
 
-	err := godotenv.Load("migrate/.env")
+	err := godotenv.Load(".env")
 
 	url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", os.Getenv("POSTGRES_USER"),
 		os.Getenv("POSTGRES_PW"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_PORT"), os.Getenv("POSTGRES_DB"))

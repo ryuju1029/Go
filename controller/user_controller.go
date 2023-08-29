@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type IUserControllerr interface {
+type IUserController interface {
 	SignUp(c echo.Context) error
 	LogIn(c echo.Context) error
 	LogOut(c echo.Context) error
@@ -20,7 +20,7 @@ type userController struct {
 	uu usecase.IUserUsecase
 }
 
-func NewUserController(uu usecase.IUserUsecase) IUserControllerr {
+func NewUserController(uu usecase.IUserUsecase) IUserController {
 	return &userController{uu}
 }
 
@@ -74,8 +74,7 @@ func (uc *userController) SetLoginCookie(c echo.Context, token string) error {
 	cookie.Domain = os.Getenv("API_DOMAIN")
 	cookie.HttpOnly = true
 	cookie.SameSite = http.SameSiteNoneMode
-
-	c.NoContent(http.StatusOK)
+	c.SetCookie(cookie)
 
 	return nil
 }
@@ -90,7 +89,7 @@ func (uc *userController) SetLogOutCookie(c echo.Context) error {
 	cookie.HttpOnly = true
 	cookie.SameSite = http.SameSiteNoneMode
 
-	c.NoContent(http.StatusOK)
+	c.SetCookie(cookie)
 
 	return nil
 }
