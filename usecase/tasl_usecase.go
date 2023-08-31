@@ -6,10 +6,10 @@ import (
 )
 
 type ITaskUsecase interface {
-	GetAllTasks(tasks *[]model.Task, userId uint) error
-	GetTaskById(userId, taskId uint) error
-	CreateTask(task model.Task) error
-	UpdateTask(task model.Task, userId, taskId uint) error
+	GetAllTasks(userId uint) ([]model.TaskResponse, error)
+	GetTaskById(userId, taskId uint) (model.TaskResponse, error)
+	CreateTask(task model.Task) (model.TaskResponse, error)
+	UpdateTask(task model.Task, userId, taskId uint) (model.TaskResponse, error)
 	DeleteTask(userId, taskId uint) error
 }
 
@@ -41,6 +41,21 @@ func (tu *taskUsecase) GetAllTasks(userId uint) ([]model.TaskResponse, error) {
 	return resTasks, nil
 }
 
+func (tu *taskUsecase) GetTaskById(userId, taskId uint) (model.TaskResponse, error) {
+	task := model.Task{}
+	if err := tu.tr.GetTaskById(&task, userId, taskId); err != nil {
+		return model.TaskResponse{}, err
+	}
+	resTask := model.TaskResponse{
+		ID:        task.ID,
+		Title:     task.Title,
+		CreatedAt: task.CreatedAt,
+		UpdatedAt: task.UpdatedAt,
+	}
+
+	return resTask, nil
+}
+
 func (tu *taskUsecase) CreateTask(task model.Task) (model.TaskResponse, error) {
 	if err := tu.tr.CreateTask(&task); err != nil {
 		return model.TaskResponse{}, err
@@ -54,4 +69,27 @@ func (tu *taskUsecase) CreateTask(task model.Task) (model.TaskResponse, error) {
 	}
 
 	return resTask, nil
+}
+
+func (tu *taskUsecase) UpdateTask(task model.Task, userId, taskId uint) (model.TaskResponse, error) {
+	if err := tu.tr.UpdateTask(&task, userId, taskId); err != nil {
+		return model.TaskResponse{}, err
+	}
+
+	resTask := model.TaskResponse{
+		ID:        task.ID,
+		Title:     task.Title,
+		CreatedAt: task.CreatedAt,
+		UpdatedAt: task.UpdatedAt,
+	}
+
+	return resTask, nil
+}
+
+func (tu *taskUsecase) DeleteTask(userId, taskId uint) error {
+	if err := tu.tr.DeleteTask(userId, taskId); err != nil {
+		return err
+	}
+
+	return nil
 }
