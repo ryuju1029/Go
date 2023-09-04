@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -24,7 +23,7 @@ type taskController struct {
 }
 
 func NewTaskController(tu usecase.ITaskUsecase) ITaskController {
-	return &taskController
+	return &taskController{tu}
 }
 
 func (tc *taskController) GetAllTasks(c echo.Context) error {
@@ -82,7 +81,7 @@ func (tc *taskController) UpdateTask(c echo.Context) error {
 	if err := c.Bind(&task); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	taskRes, err := tc.tu.UpdateTask(task, uint(userId(float64)), uint(taskId))
+	taskRes, err := tc.tu.UpdateTask(task, uint(userId.(float64)), uint(taskId))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -92,7 +91,7 @@ func (tc *taskController) UpdateTask(c echo.Context) error {
 func (tc *taskController) DeleteTask(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
-	userId := claims("user_id")
+	userId := claims["user_id"]
 	id := c.Param("taskId")
 	taskId, _ := strconv.Atoi(id)
 
